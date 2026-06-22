@@ -2,7 +2,7 @@
 
 #include <SDL_log.h>
 #include <QHostAddress>
-#include <QEndian>
+#include <QtEndian>
 
 MicUplink::MicUplink(QObject* parent)
     : QObject(parent)

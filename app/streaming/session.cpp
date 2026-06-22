@@ -1711,7 +1711,7 @@ bool Session::startConnectionAsync()
         try {
             if (http.requestMicUplink(micInfo) && micInfo.enabled) {
                 m_MicUplink = new MicUplink(this);
-                QString hostAddr = m_Computer->activeAddress.address().toString();
+                QString hostAddr = m_Computer->activeAddress.address();
                 if (!m_MicUplink->start(hostAddr, micInfo, m_Preferences->micDeviceName)) {
                     SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
                                 "Mic uplink failed to start, continuing without mic");
