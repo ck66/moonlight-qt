@@ -943,7 +943,7 @@ Flickable {
                 CheckBox {
                     id: micUplinkCheck
                     width: parent.width
-                    text: qsTr("Stream microphone to host")
+                    text: qsTr("麦克风串流到主机")
                     font.pointSize: 12
                     checked: StreamingPreferences.enableMicUplink
                     onCheckedChanged: {
@@ -953,12 +953,12 @@ Flickable {
                     ToolTip.delay: 1000
                     ToolTip.timeout: 5000
                     ToolTip.visible: hovered
-                    ToolTip.text: qsTr("Sends your microphone audio to the host PC. Requires a Sunshine host with mic-uplink support.")
+                    ToolTip.text: qsTr("将你的麦克风音频发送至主机。需要搭载麦克风上行传输功能的Sunshine主机才能使用")
                 }
 
                 Label {
                     width: parent.width
-                    text: qsTr("Microphone device")
+                    text: qsTr("麦克风设备")
                     font.pointSize: 12
                     visible: micUplinkCheck.checked
                     wrapMode: Text.Wrap
@@ -971,7 +971,7 @@ Flickable {
 
                     Component.onCompleted: {
                         var devices = []
-                        devices.push({ text: qsTr("System default"), val: "" })
+                        devices.push({ text: qsTr("系统默认"), val: "" })
                         var count = SystemProperties.getAudioInputDeviceCount()
                         for (var i = 0; i < count; i++) {
                             var name = SystemProperties.getAudioInputDeviceName(i)
