@@ -42,6 +42,10 @@ public:
     Q_INVOKABLE void waitForAsyncLoad();
     Q_INVOKABLE void refreshDisplays();
 
+    // 枚举 SDL 音频输入（录音）设备，供 QML 麦克风设备选择下拉框使用
+    Q_INVOKABLE int getAudioInputDeviceCount();
+    Q_INVOKABLE QString getAudioInputDeviceName(int index);
+
 signals:
     void unmappedGamepadsChanged();
     void hasHardwareAccelerationChanged();

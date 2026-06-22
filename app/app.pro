@@ -194,6 +194,7 @@ SOURCES += \
     streaming/session.cpp \
     streaming/audio/audio.cpp \
     streaming/audio/renderers/sdlaud.cpp \
+    streaming/mic/micuplink.cpp \
     gui/computermodel.cpp \
     gui/appmodel.cpp \
     streaming/bandwidth.cpp \
@@ -231,6 +232,7 @@ HEADERS += \
     streaming/session.h \
     streaming/audio/renderers/renderer.h \
     streaming/audio/renderers/sdl.h \
+    streaming/mic/micuplink.h \
     gui/computermodel.h \
     gui/appmodel.h \
     streaming/video/decoder.h \

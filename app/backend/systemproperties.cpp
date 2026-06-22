@@ -268,3 +268,24 @@ void SystemProperties::refreshDisplays()
 
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
+
+int SystemProperties::getAudioInputDeviceCount()
+{
+    // 确保 SDL audio 子系统已初始化
+    if (!SDL_WasInit(SDL_INIT_AUDIO)) {
+        if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
+            return 0;
+        }
+    }
+
+    return SDL_GetNumAudioDevices(1);  // iscapture = 1
+}
+
+QString SystemProperties::getAudioInputDeviceName(int index)
+{
+    const char* name = SDL_GetAudioDeviceName(index, 1);  // iscapture = 1
+    if (name == nullptr) {
+        return QString();
+    }
+    return QString::fromUtf8(name);
+}

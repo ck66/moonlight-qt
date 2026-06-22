@@ -145,6 +145,8 @@ public:
     Q_PROPERTY(bool keepAwake MEMBER keepAwake NOTIFY keepAwakeChanged)
     Q_PROPERTY(CaptureSysKeysMode captureSysKeysMode MEMBER captureSysKeysMode NOTIFY captureSysKeysModeChanged)
     Q_PROPERTY(Language language MEMBER language NOTIFY languageChanged);
+    Q_PROPERTY(bool enableMicUplink MEMBER enableMicUplink NOTIFY enableMicUplinkChanged)
+    Q_PROPERTY(QString micDeviceName MEMBER micDeviceName NOTIFY micDeviceNameChanged)
 
     Q_INVOKABLE bool retranslate();
 
@@ -187,6 +189,8 @@ public:
     UIDisplayMode uiDisplayMode;
     Language language;
     CaptureSysKeysMode captureSysKeysMode;
+    bool enableMicUplink;
+    QString micDeviceName;
 
 signals:
     void displayModeChanged();
@@ -224,6 +228,8 @@ signals:
     void captureSysKeysModeChanged();
     void keepAwakeChanged();
     void languageChanged();
+    void enableMicUplinkChanged();
+    void micDeviceNameChanged();
 
 private:
     explicit StreamingPreferences(QQmlEngine *qmlEngine);

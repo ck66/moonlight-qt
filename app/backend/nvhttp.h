@@ -12,6 +12,9 @@
 
 class NvComputer;
 
+// 前向声明：麦克风上行协商信息结构体
+struct MicUplinkInfo;
+
 class NvDisplayMode
 {
 public:
@@ -171,6 +174,12 @@ public:
              int gamepadMask,
              bool persistGameControllersOnDisconnect,
              QString& rtspSessionUrl);
+
+    // 请求服务端开启麦克风上行通道
+    // 向 HTTPS /mic-uplink 端点发送 GET 请求，解析 axiMic* XML 字段
+    // 返回 true 表示服务端支持且已启用麦克风上行
+    bool
+    requestMicUplink(MicUplinkInfo& info);
 
     QVector<NvApp>
     getAppList();

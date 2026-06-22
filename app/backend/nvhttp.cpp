@@ -1,4 +1,5 @@
 #include "nvcomputer.h"
+#include "streaming/mic/micuplink.h"
 #include <Limelight.h>
 
 #include <QDebug>
@@ -266,6 +267,55 @@ NvHTTP::quitApp()
         // that they can't kill someone else's stream.
         throw GfeHttpResponseException(599, "");
     }
+}
+
+bool
+NvHTTP::requestMicUplink(MicUplinkInfo& info)
+{
+    // GET https://host:port/mic-uplink
+    // openConnection() 会自动追加 uniqueid 参数
+    QString response;
+    try {
+        response = openConnectionToString(m_BaseUrlHttps,
+                                           "mic-uplink",
+                                           nullptr,
+                                           REQUEST_TIMEOUT_MS,
+                                           NvLogLevel::NVLL_VERBOSE);
+    } catch (const GfeHttpResponseException& e) {
+        // 服务端不支持 /mic-uplink（通常返回 404）→ 麦克风不可用，不中断串流
+        qInfo() << "Mic uplink not available:" << e.toQString();
+        info.enabled = false;
+        return false;
+    } catch (const QtNetworkReplyException& e) {
+        qInfo() << "Mic uplink request failed:" << e.toQString();
+        info.enabled = false;
+        return false;
+    }
+
+    qInfo() << "Mic uplink response:" << response;
+
+    // 解析 XML 响应中的 axiMic* 字段
+    info.enabled = getXmlString(response, "axiMicEnabled").toInt() == 1;
+    if (!info.enabled) {
+        return false;
+    }
+
+    info.port = getXmlString(response, "axiMicPort").toUShort();
+    info.sessionId = getXmlString(response, "axiMicSessionId").toUInt();
+    info.token = getXmlStringFromHex(response, "axiMicToken");
+    info.sampleRate = getXmlString(response, "axiMicSampleRate").toInt();
+    info.channels = getXmlString(response, "axiMicChannels").toInt();
+    info.frameMs = getXmlString(response, "axiMicFrameMs").toInt();
+    info.codec = getXmlString(response, "axiMicCodec");
+
+    qInfo() << "Mic uplink negotiated: port=" << info.port
+            << "sessionId=" << info.sessionId
+            << "sampleRate=" << info.sampleRate
+            << "channels=" << info.channels
+            << "frameMs=" << info.frameMs
+            << "codec=" << info.codec;
+
+    return true;
 }
 
 QVector<NvDisplayMode>

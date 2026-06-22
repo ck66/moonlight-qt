@@ -10,6 +10,7 @@
 #include "video/decoder.h"
 #include "audio/renderers/renderer.h"
 #include "video/overlaymanager.h"
+#include "mic/micuplink.h"
 
 class SupportedVideoFormatList : public QList<int>
 {
@@ -278,6 +279,9 @@ private:
     OPUS_MULTISTREAM_CONFIGURATION m_OriginalAudioConfig;
     int m_AudioSampleCount;
     Uint32 m_DropAudioEndTime;
+
+    // 麦克风上行管理器（非 null 表示正在运行）
+    MicUplink* m_MicUplink = nullptr;
 
     Overlay::OverlayManager m_OverlayManager;
 

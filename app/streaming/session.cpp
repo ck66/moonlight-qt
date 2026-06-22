@@ -2,6 +2,8 @@
 #include "settings/streamingpreferences.h"
 #include "streaming/streamutils.h"
 #include "backend/richpresencemanager.h"
+#include "backend/nvhttp.h"
+#include "backend/identitymanager.h"
 
 #include <Limelight.h>
 #include "SDL_compat.h"
@@ -1271,6 +1273,13 @@ private:
         // LiStartConnection() and LiStopConnection().
         SDL_assert(m_Session->m_VideoDecoder == nullptr);
 
+        // 停止麦克风上行（必须在 LiStopConnection 之前，避免访问已释放的会话状态）
+        if (m_Session->m_MicUplink) {
+            m_Session->m_MicUplink->stop();
+            delete m_Session->m_MicUplink;
+            m_Session->m_MicUplink = nullptr;
+        }
+
         // Finish cleanup of the connection state
         LiStopConnection();
 
@@ -1693,6 +1702,31 @@ bool Session::startConnectionAsync()
         // We already displayed an error dialog in the stage failure
         // listener.
         return false;
+    }
+
+    // 启动麦克风上行（如果用户启用了且服务端支持）
+    if (m_Preferences->enableMicUplink) {
+        MicUplinkInfo micInfo;
+        NvHTTP http(m_Computer);
+        try {
+            if (http.requestMicUplink(micInfo) && micInfo.enabled) {
+                m_MicUplink = new MicUplink(this);
+                QString hostAddr = m_Computer->activeAddress.address().toString();
+                if (!m_MicUplink->start(hostAddr, micInfo, m_Preferences->micDeviceName)) {
+                    SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                                "Mic uplink failed to start, continuing without mic");
+                    delete m_MicUplink;
+                    m_MicUplink = nullptr;
+                }
+            }
+        } catch (...) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                        "Mic uplink negotiation failed, continuing without mic");
+            if (m_MicUplink) {
+                delete m_MicUplink;
+                m_MicUplink = nullptr;
+            }
+        }
     }
 
     emit connectionStarted();

@@ -939,6 +939,71 @@ Flickable {
                     ToolTip.visible: hovered
                     ToolTip.text: qsTr("Mutes Moonlight's audio when you Alt+Tab out of the stream or click on a different window.")
                 }
+
+                CheckBox {
+                    id: micUplinkCheck
+                    width: parent.width
+                    text: qsTr("Stream microphone to host")
+                    font.pointSize: 12
+                    checked: StreamingPreferences.enableMicUplink
+                    onCheckedChanged: {
+                        StreamingPreferences.enableMicUplink = checked
+                    }
+
+                    ToolTip.delay: 1000
+                    ToolTip.timeout: 5000
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Sends your microphone audio to the host PC. Requires a Sunshine host with mic-uplink support.")
+                }
+
+                Label {
+                    width: parent.width
+                    text: qsTr("Microphone device")
+                    font.pointSize: 12
+                    visible: micUplinkCheck.checked
+                    wrapMode: Text.Wrap
+                }
+
+                AutoResizingComboBox {
+                    id: micDeviceComboBox
+                    textRole: "text"
+                    visible: micUplinkCheck.checked
+
+                    Component.onCompleted: {
+                        var devices = []
+                        devices.push({ text: qsTr("System default"), val: "" })
+                        var count = SystemProperties.getAudioInputDeviceCount()
+                        for (var i = 0; i < count; i++) {
+                            var name = SystemProperties.getAudioInputDeviceName(i)
+                            if (name && name.length > 0) {
+                                devices.push({ text: name, val: name })
+                            }
+                        }
+                        micDeviceModel.clear()
+                        for (var j = 0; j < devices.length; j++) {
+                            micDeviceModel.append(devices[j])
+                        }
+
+                        // 选中已保存的设备
+                        var saved = StreamingPreferences.micDeviceName
+                        currentIndex = 0
+                        for (var k = 0; k < micDeviceModel.count; k++) {
+                            if (micDeviceModel.get(k).val === saved) {
+                                currentIndex = k
+                                break
+                            }
+                        }
+                        activated(currentIndex)
+                    }
+
+                    model: ListModel {
+                        id: micDeviceModel
+                    }
+
+                    onActivated: {
+                        StreamingPreferences.micDeviceName = micDeviceModel.get(currentIndex).val
+                    }
+                }
             }
         }
 
